@@ -73,7 +73,7 @@ server.on('message', (msg, senderInfo) => {
     let body = '' + msg;
     //Split sting into the nodes/readings
     let readings = body.split('AA');
-    // console.log(readings);
+    console.log(readings);
 
     for (let i = 1; i < readings.length; i++) {
       let payload = readings[i].split('00FF00FF');
@@ -253,9 +253,9 @@ server.on('message', (msg, senderInfo) => {
       }
     }
 
-    // server.send(msg, senderInfo.port, senderInfo.address, () => {
-    //   // console.log(`Message sent to ${senderInfo.address}:${senderInfo.port}`);
-    // });
+    server.send(msg, senderInfo.port, senderInfo.address, () => {
+      console.log(`Message sent to ${senderInfo.address}:${senderInfo.port}`);
+    });
   } catch (err) {
     console.error(err);
   }
