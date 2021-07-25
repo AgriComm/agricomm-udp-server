@@ -258,7 +258,7 @@ server.on('message', (msg, senderInfo) => {
       console.log(`Message sent to ${senderInfo.address}:${senderInfo.port}`);
     });
   } catch (err) {
-    console.error(err);
+    console.log(err);
   }
 });
 
