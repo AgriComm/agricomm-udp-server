@@ -1,6 +1,6 @@
 const dgram = require('dgram');
 const server = dgram.createSocket('udp4');
-// const DynamoDB = require('./utils/dynamodb_node');
+const DynamoDB = require('./utils/dynamodb_node');
 
 const time = Date.now();
 let count = 0;
@@ -114,7 +114,7 @@ server.on('message', (msg, senderInfo) => {
               value: voltage,
             };
 
-            // DynamoDB.appendNodeBatt(`${node_id}`, data_batt);
+            DynamoDB.appendNodeBatt(`${node_id}`, data_batt);
             break;
 
           case 2: // Solar Panel voltage
@@ -242,7 +242,7 @@ server.on('message', (msg, senderInfo) => {
                   heading: parseFloat(gps_data[8]),
                 };
 
-                // DynamoDB.appendLocation(`${node_id}`, data1);
+                DynamoDB.appendLocation(`${node_id}`, data1);
                 break;
               }
             }
