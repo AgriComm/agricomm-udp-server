@@ -254,9 +254,9 @@ server.on('message', (msg, senderInfo) => {
       }
     }
 
-    server.send(msg, senderInfo.port, senderInfo.address, () => {
-      console.log(`Message sent to ${senderInfo.address}:${senderInfo.port}`);
-    });
+    // server.send(msg, senderInfo.port, senderInfo.address, () => {
+    //   console.log(`Message sent to ${senderInfo.address}:${senderInfo.port}`);
+    // });
   } catch (err) {
     console.log(err);
   }
