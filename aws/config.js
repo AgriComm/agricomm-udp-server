@@ -4,8 +4,9 @@ module.exports = {
       //Provide details for local configuration
     },
     aws_remote_config: {
-      accessKeyId: process.env.AWS_KEY,
-      secretAccessKey: process.env.AWS_SECRET_KEY,
+      accessKeyId: "AKIA4TFQWYRHPDYD43HZ",
+      secretAccessKey: "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",
       region: 'us-east-2',
+      endpoint: "https://dynamodb.us-east-2.amazonaws.com"
     }
 };

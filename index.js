@@ -1,3 +1,4 @@
+// const { DynamoDB } = require('aws-sdk');
 const dgram = require('dgram');
 const server = dgram.createSocket('udp4');
 const DynamoDB = require('./utils/dynamodb_node');
@@ -72,20 +73,28 @@ server.on('message', (msg, senderInfo) => {
     let avg_occ = count / diff;
     let body = '' + msg;
     //Split sting into the nodes/readings
-    console.log("Body: ", body);
+    console.log('Body: ', body);
     let readings = body.split('AA');
     // console.log(readings);
 
     for (let i = 1; i < readings.length; i++) {
+      let readingTime = Date.now();
       let payload = readings[i].split('00FF00FF');
+      let uploadData = {};
       // console.log("Payload: ", payload);
       //Get the node_id from
       let node_id = parseInt(payload[0], 16);
+      let id = readingTime + node_id;
+      console.log("ID: ", id)
+
       // console.log("node ID: ", node_id)
       // Get function_id:
 
       const now = new Date();
       now.setHours(now.getHours() + 2);
+      uploadData.id = `${id}`;
+      uploadData.nodeId = node_id;
+      uploadData.dateTime = now.toISOString();
 
       let data = {
         date_time: now.toISOString(),
@@ -109,20 +118,22 @@ server.on('message', (msg, senderInfo) => {
             var dt = new Date();
             dt.setTime(dt.getTime() + 2 * 60 * 60 * 1000);
 
-            var data_batt = {
-              date_time: dt.toISOString(),
-              value: voltage,
-            };
+            // var data_batt = {
+            //   value: voltage
+            // };
+            uploadData.nodeBattery = parseFloat(voltage);
 
-            DynamoDB.appendNodeBatt(`${node_id}`, data_batt);
+            // DynamoDB.appendNodeBatt(`${node_id}`, data_batt);
             break;
 
           case 2: // Solar Panel voltage
             let a = parseInt(`${sensor_reading}`, 16);
             let solar_vol = ((8 / Math.pow(2, 10)) * a).toFixed(2);
+            uploadData.solarVoltage = parseFloat(solar_vol);
             break;
 
           case 4: // GPS
+            // Documentation: http://aprs.gids.nl/nmea/
             let gps = '';
 
             for (let l = 0; l < sensor_reading.length; l = l + 2) {
@@ -132,119 +143,48 @@ server.on('message', (msg, senderInfo) => {
 
             if (gps != '') {
               gps_data = gps.split(',');
+              // console.log("Gps Data: ", gps_data)
+              // console.log("Validity: ", gps_data[2])
 
-              // History of location for node
-              let nodePrevLocation = {};
-              let index = 0;
-              let needIt = true;
-              for (let l = 0; l < prevLocation.length; l++) {
-                if (prevLocation[l].nodeId === node_id) {
-                  index = l;
-                  nodePrevLocation.lat = prevLocation[l].lat;
-                  nodePrevLocation.lng = prevLocation[l].lng;
-                  nodePrevLocation.dateTime = prevLocation[l].dateTime;
-                  needIt = false;
+              // Only push when the validity of the GPS is "A"
+              if (gps_data[2] === 'V') {
+                uploadData.nodeType = "GPS"; // Shows that the line in the db has gps values
+                // console.log("A Okay")
+                let latitude = parseFloat(
+                  lat(gps_data[3], gps_data[4]).toFixed(6)
+                );
+                let longitude = parseFloat(
+                  lng(gps_data[5], gps_data[6]).toFixed(6)
+                );
+                let speed = parseFloat((1.85 * gps_data[7]).toFixed(2));
+                let heatWeight = 0;
+
+                if (speed <= 10) {
+                  heatWeight = 0;
+                } else if (speed >= 10) {
+                  heatWeight = 1;
+                } else if (speed >= 20) {
+                  heatWeight = 2;
+                } else if (speed >= 30) {
+                  heatWeight = 3;
                 }
-              }
 
-              if (needIt) {
-                prevLocation.push({
-                  nodeId: node_id,
-                  lat: parseFloat(lat(gps_data[3], gps_data[4]).toFixed(6)),
-                  lng: parseFloat(lng(gps_data[5], gps_data[6]).toFixed(6)),
-                  dateTime: now,
-                });
-                nodePrevLocation.lat = parseFloat(
-                  lat(gps_data[3], gps_data[4]).toFixed(6)
-                );
-                nodePrevLocation.lng = parseFloat(
-                  lng(gps_data[5], gps_data[6]).toFixed(6)
-                );
-                nodePrevLocation.dateTime = now;
-              }
-
-              var dt = new Date();
-              dt.setTime(dt.getTime() + 2 * 60 * 60 * 1000);
-
-              var heatWeight = 0;
-              var speed = parseFloat((1.85 * gps_data[7]).toFixed(2));
-
-              // console.log("Speed: ", speed);
-
-              if (speed === 10) {
-                heatWeight = 0;
-              } else if (speed >= 30) {
-                heatWeight = 1;
-              } else if (speed >= 20) {
-                heatWeight = 2;
-              } else if (speed >= 30) {
-                heatWeight = 3;
-              }
-
-              let test = parseFloat(lat(gps_data[3], gps_data[4]).toFixed(6));
-
-              let arr = [
-                nodePrevLocation,
-                {
-                  lat: parseFloat(lat(gps_data[3], gps_data[4]).toFixed(6)),
-                  lng: parseFloat(lng(gps_data[5], gps_data[6]).toFixed(6)),
-                },
-              ];
-              // console.log("Array: ", arr)
-              dist = distance(arr);
-              // console.log("Distance: ", dist);
-              // console.log("prevLocation before: ", prevLocation)
-              let timeDiff = (now - nodePrevLocation.dateTime) / 3600000;
-              let calcSpeed = 0;
-              if (timeDiff != 0) {
-                calcSpeed = dist / timeDiff;
-                // console.log("Calculated Speed: ", calcSpeed);
-              }
-              let diffSpeed = calcSpeed - speed;
-
-              console.log(
-                'Diff in speed: ',
-                diffSpeed,
-                ' | Distance: ',
-                dist,
-                ' | Speed GPS: ',
-                speed
-              );
-
-              if (dist != 0 && test != 0.0) {
-                prevLocation[index].lat = parseFloat(
-                  lat(gps_data[3], gps_data[4]).toFixed(6)
-                );
-                prevLocation[index].lng = parseFloat(
-                  lng(gps_data[5], gps_data[6]).toFixed(6)
-                );
-                prevLocation[index].dateTime = now;
-                var data1 = {
+                uploadData.gps = {
                   location: {
-                    location: {
-                      lat: parseFloat(lat(gps_data[3], gps_data[4]).toFixed(6)),
-                      lng: parseFloat(lng(gps_data[5], gps_data[6]).toFixed(6)),
-                    },
-                    date_time: dt.toISOString(),
+                    lat: latitude,
+                    lng: longitude,
                   },
-                  locationPoints: {
-                    lat: parseFloat(lat(gps_data[3], gps_data[4]).toFixed(6)),
-                    lng: parseFloat(lng(gps_data[5], gps_data[6]).toFixed(6)),
-                  },
-                  speed: parseFloat((1.85 * gps_data[7]).toFixed(2)),
-                  heatmap: {
-                    location: {
-                      lat: parseFloat(lat(gps_data[3], gps_data[4]).toFixed(6)),
-                      lng: parseFloat(lng(gps_data[5], gps_data[6]).toFixed(6)),
-                    },
-                    weight: heatWeight,
-                  },
-                  heading: parseFloat(gps_data[8]),
+                  speed: speed,
+                  heatWeight: heatWeight
                 };
-
-                DynamoDB.appendLocation(`${node_id}`, data1);
-                break;
               }
+
+              // var dt = new Date();
+              // dt.setTime(dt.getTime() + 2 * 60 * 60 * 1000);
+
+              // DynamoDB.appendLocation(`${node_id}`, data1);
+              break;
+              // }
             }
 
           // case 3: // Node Temp
@@ -252,6 +192,8 @@ server.on('message', (msg, senderInfo) => {
           //   break;
         }
       }
+      console.log('Uplaod data: ', uploadData);
+      DynamoDB.addNodeReading(id, uploadData);
     }
 
     // server.send(msg, senderInfo.port, senderInfo.address, () => {

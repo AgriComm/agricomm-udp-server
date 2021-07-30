@@ -4,16 +4,18 @@ const uuidv1 = require('uuid/v1');
 
 
 
-const addNodeReading = function (body) {
+const addNodeReading = function (id, body) {
     AWS.config.update(config.aws_remote_config);
     const docClient = new AWS.DynamoDB.DocumentClient();
-    const Item = body;
+    // const Item = body;
+    console.log(body)
     var timestamp = new Date().getTime();
     // console.log(timestamp)
-    Item._id = timestamp;
+    // Item.id = timestamp;
     var params = {
         TableName: config.aws_table_name,
-        Item: Item
+        // Key: { id: `${id}` },
+        Item: body
     };
 
     // Call DynamoDB to add the item to the table
