@@ -73,7 +73,7 @@ server.on('message', (msg, senderInfo) => {
     let avg_occ = count / diff;
     let body = '' + msg;
     //Split sting into the nodes/readings
-    console.log('Body: ', body);
+    // console.log('Body: ', body);
     let readings = body.split('AA');
     // console.log(readings);
 
@@ -85,7 +85,7 @@ server.on('message', (msg, senderInfo) => {
       //Get the node_id from
       let node_id = parseInt(payload[0], 16);
       let id = readingTime + node_id;
-      console.log("ID: ", id)
+      // console.log("ID: ", id)
 
       // console.log("node ID: ", node_id)
       // Get function_id:
@@ -192,7 +192,7 @@ server.on('message', (msg, senderInfo) => {
           //   break;
         }
       }
-      console.log('Uplaod data: ', uploadData);
+      console.log('Upload data: ', uploadData);
       DynamoDB.addNodeReading(id, uploadData);
     }
 
@@ -201,6 +201,10 @@ server.on('message', (msg, senderInfo) => {
     // });
   } catch (err) {
     console.log(err);
+    let url =
+        "https://discord.com/api/webhooks/805085262337933332/D9Jn_IOBz134Qh-aVwJhPHk-kWSXDVvlym2TjCC8J35q1D6xAQbfdUdNTGtJlUmnbyhV";
+      let message = `${err}`;
+      discord_message(url, message);
   }
 });
 
@@ -210,3 +214,17 @@ server.on('listening', () => {
 });
 
 server.bind(5500);
+
+
+function discord_message(webHookURL, message) {
+  var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", webHookURL, true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.send(
+    JSON.stringify({
+      content: message,
+      username: "EC2 - Server",
+    })
+  );
+}
