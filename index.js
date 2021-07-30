@@ -147,7 +147,7 @@ server.on('message', (msg, senderInfo) => {
               // console.log("Validity: ", gps_data[2])
 
               // Only push when the validity of the GPS is "A"
-              if (gps_data[2] === 'V') {
+              if (gps_data[2] === 'A') {
                 uploadData.nodeType = "GPS"; // Shows that the line in the db has gps values
                 // console.log("A Okay")
                 let latitude = parseFloat(
