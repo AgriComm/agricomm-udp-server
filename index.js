@@ -95,6 +95,11 @@ server.on('message', (msg, senderInfo) => {
       uploadData.id = `${id}`;
       uploadData.nodeId = node_id;
       uploadData.dateTime = now.toISOString();
+      uploadData.updatedAt = now.toISOString();
+      uploadData.createdAt = now.toISOString();
+      uploadData.__typename = 'Node';
+
+
 
       let data = {
         date_time: now.toISOString(),
