@@ -1,4 +1,3 @@
-// const { DynamoDB } = require('aws-sdk');
 const dgram = require('dgram');
 const server = dgram.createSocket('udp4');
 const DynamoDB = require('./utils/dynamodb_node');
@@ -69,6 +68,8 @@ server.on('message', (msg, senderInfo) => {
     //Define body
     count++;
     let time_now = Date.now();
+    let time_new = new Date();
+    // let time_format = time_now.format("dd mmm yyyy hh:MMtt")
     let diff = (time_now - time) / 60000;
     let avg_occ = count / diff;
     let body = '' + msg;
@@ -84,7 +85,9 @@ server.on('message', (msg, senderInfo) => {
       // console.log("Payload: ", payload);
       //Get the node_id from
       let node_id = parseInt(payload[0], 16);
-      let id = readingTime + node_id;
+      // console.log(`${node_id}:${time_new.getUTCFullYear()}:${time_new.getMonth()+1}:${time_new.getDate()}`)
+
+      // let id = ;
       // console.log("ID: ", id)
 
       // console.log("node ID: ", node_id)
@@ -92,14 +95,14 @@ server.on('message', (msg, senderInfo) => {
 
       const now = new Date();
       now.setHours(now.getHours() + 2);
-      uploadData.id = `${id}`;
+      uploadData.id = `${node_id}:${time_new.getUTCFullYear()}:${
+        time_new.getMonth() + 1
+      }:${time_new.getDate()}`;
       uploadData.nodeId = node_id;
-      uploadData.dateTime = now.toISOString();
-      uploadData.updatedAt = now.toISOString();
-      uploadData.createdAt = now.toISOString();
+      // uploadData.dateTime = now.toISOString();
+      // uploadData.updatedAt = now.toISOString();
+      // uploadData.createdAt = now.toISOString();
       uploadData.__typename = 'Node';
-
-
 
       let data = {
         date_time: now.toISOString(),
@@ -126,7 +129,10 @@ server.on('message', (msg, senderInfo) => {
             // var data_batt = {
             //   value: voltage
             // };
-            uploadData.nodeBattery = parseFloat(voltage);
+            uploadData.nodeBattery = {
+              value: parseFloat(voltage),
+              dateTime: now.toISOString(),
+            };
 
             // DynamoDB.appendNodeBatt(`${node_id}`, data_batt);
             break;
@@ -134,7 +140,10 @@ server.on('message', (msg, senderInfo) => {
           case 2: // Solar Panel voltage
             let a = parseInt(`${sensor_reading}`, 16);
             let solar_vol = ((8 / Math.pow(2, 10)) * a).toFixed(2);
-            uploadData.solarVoltage = parseFloat(solar_vol);
+            uploadData.solarVoltage = {
+              value: parseFloat(solar_vol),
+              dateTime: now.toISOString(),
+            };
             break;
 
           case 4: // GPS
@@ -153,7 +162,7 @@ server.on('message', (msg, senderInfo) => {
 
               // Only push when the validity of the GPS is "A"
               if (gps_data[2] === 'A') {
-                uploadData.nodeType = "GPS"; // Shows that the line in the db has gps values
+                uploadData.nodeType = 'GPS'; // Shows that the line in the db has gps values
                 // console.log("A Okay")
                 let latitude = parseFloat(
                   lat(gps_data[3], gps_data[4]).toFixed(6)
@@ -180,7 +189,8 @@ server.on('message', (msg, senderInfo) => {
                     lng: longitude,
                   },
                   speed: speed,
-                  heatWeight: heatWeight
+                  heatWeight: heatWeight,
+                  dateTime: now.toISOString(),
                 };
               }
 
@@ -197,8 +207,12 @@ server.on('message', (msg, senderInfo) => {
           //   break;
         }
       }
-      console.log('Upload data: ', uploadData);
-      DynamoDB.addNodeReading(id, uploadData);
+      console.log('Upload Node ID: ', uploadData.nodeId, " | Batt Value", uploadData.nodeBattery.value);
+      if (uploadData.nodeId > 60928) {
+        DynamoDB.updateACNode(uploadData);
+      } else {
+        DynamoDB.updateNode(uploadData);
+      }
     }
 
     // server.send(msg, senderInfo.port, senderInfo.address, () => {
@@ -207,9 +221,9 @@ server.on('message', (msg, senderInfo) => {
   } catch (err) {
     console.log(err);
     let url =
-        "https://discord.com/api/webhooks/805085262337933332/D9Jn_IOBz134Qh-aVwJhPHk-kWSXDVvlym2TjCC8J35q1D6xAQbfdUdNTGtJlUmnbyhV";
-      let message = `Body: ${body} | Error: ${err}`;
-      discord_message(url, message);
+      'https://discord.com/api/webhooks/805085262337933332/D9Jn_IOBz134Qh-aVwJhPHk-kWSXDVvlym2TjCC8J35q1D6xAQbfdUdNTGtJlUmnbyhV';
+    // let message = `Body: ${body} | Error: ${err}`;
+    // discord_message(url, message);
   }
 });
 
@@ -220,16 +234,17 @@ server.on('listening', () => {
 
 server.bind(5500);
 
-
 function discord_message(webHookURL, message) {
-  var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+  var XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
   var xhr = new XMLHttpRequest();
-  xhr.open("POST", webHookURL, true);
-  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.open('POST', webHookURL, true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.send(
     JSON.stringify({
       content: message,
-      username: "EC2 - Server",
+      username: 'EC2 - Server',
     })
   );
 }
+
+// Current function 05
