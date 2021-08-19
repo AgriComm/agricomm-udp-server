@@ -1,5 +1,5 @@
 module.exports = {
-    aws_table_name: 'Node-pexbhefscfcotorlzbijbskmeu-dev',
+    aws_table_name: 'Node-ibasbrdqobaexkkxqltgea5hsy-dev',
     aws_agricomm_table_name: 'Node-AgriComm-Network',
     aws_local_config: {
       //Provide details for local configuration
