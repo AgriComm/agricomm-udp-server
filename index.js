@@ -149,6 +149,7 @@ server.on('message', (msg, senderInfo) => {
           case 4: // GPS
             // Documentation: http://aprs.gids.nl/nmea/
             let gps = '';
+            console.log("GPS Sensor Reading:", sensor_reading)
 
             for (let l = 0; l < sensor_reading.length; l = l + 2) {
               let acii = hex2a(`${sensor_reading.slice(l, l + 2)}`);
@@ -157,7 +158,7 @@ server.on('message', (msg, senderInfo) => {
 
             if (gps != '') {
               gps_data = gps.split(',');
-              // console.log("Gps Data: ", gps_data)
+              console.log("Gps Data: ", gps_data)
               // console.log("Validity: ", gps_data[2])
 
               // Only push when the validity of the GPS is "A"
