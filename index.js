@@ -161,6 +161,8 @@ server.on('message', (msg, senderInfo) => {
               // console.log("Validity: ", gps_data[2])
 
               // Only push when the validity of the GPS is "A"
+              console.log('GPS Data:', gps)
+              console.log("GPS Precision Value: ", gps_data[2] )
               if (gps_data[2] === 'A') {
                 uploadData.nodeType = 'GPS'; // Shows that the line in the db has gps values
                 // console.log("A Okay")
@@ -172,7 +174,8 @@ server.on('message', (msg, senderInfo) => {
                 );
                 let speed = parseFloat((1.85 * gps_data[7]).toFixed(2));
                 let heatWeight = 0;
-
+                
+                // Calc Heat Weight
                 if (speed <= 10) {
                   heatWeight = 0;
                 } else if (speed >= 10) {
@@ -207,9 +210,9 @@ server.on('message', (msg, senderInfo) => {
           //   break;
         }
       }
-      console.log('Upload Node ID: ', uploadData.nodeId, " | Batt Value", uploadData.nodeBattery.value);
+      console.log('Upload Node ID: ', uploadData.nodeId, " | Batt Value:", uploadData.nodeBattery.value);
       if (uploadData.nodeId > 60928) {
-        DynamoDB.updateACNode(uploadData);
+        DynamoDB.updateACNode(uploadData); //AgriComm Network
       } else {
         DynamoDB.updateNode(uploadData);
       }
