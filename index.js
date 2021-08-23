@@ -78,6 +78,8 @@ server.on('message', (msg, senderInfo) => {
     let readings = body.split('AA');
     // console.log(readings);
 
+    let incomeData = {}
+
     for (let i = 1; i < readings.length; i++) {
       let readingTime = Date.now();
       let payload = readings[i].split('00FF00FF');
@@ -149,7 +151,7 @@ server.on('message', (msg, senderInfo) => {
           case 4: // GPS
             // Documentation: http://aprs.gids.nl/nmea/
             let gps = '';
-            console.log("GPS Sensor Reading:", sensor_reading)
+            // console.log('GPS Sensor Reading:', sensor_reading);
 
             for (let l = 0; l < sensor_reading.length; l = l + 2) {
               let acii = hex2a(`${sensor_reading.slice(l, l + 2)}`);
@@ -158,12 +160,12 @@ server.on('message', (msg, senderInfo) => {
 
             if (gps != '') {
               gps_data = gps.split(',');
-              console.log("Gps Data: ", gps_data)
+              // console.log('Gps Data: ', gps_data);
               // console.log("Validity: ", gps_data[2])
 
               // Only push when the validity of the GPS is "A"
-              console.log('GPS Data:', gps)
-              console.log("GPS Precision Value: ", gps_data[2] )
+              // console.log('GPS Data:', gps);
+              // console.log('GPS Precision Value: ', gps_data[2]);
               if (gps_data[2] === 'A') {
                 uploadData.nodeType = 'GPS'; // Shows that the line in the db has gps values
                 // console.log("A Okay")
@@ -175,7 +177,7 @@ server.on('message', (msg, senderInfo) => {
                 );
                 let speed = parseFloat((1.85 * gps_data[7]).toFixed(2));
                 let heatWeight = 0;
-                
+
                 // Calc Heat Weight
                 if (speed <= 10) {
                   heatWeight = 0;
@@ -206,18 +208,37 @@ server.on('message', (msg, senderInfo) => {
               // }
             }
 
-          // case 3: // Node Temp
+          case 3: // Current Sensor
+            let threshold = 0.1;
+            let maxScale = 12; // Sensor full range = 12 A
+            // console.log("Sensor Reading",parseFloat(sensor_reading))
+            let sensorCurrent = sensor_reading * (maxScale / 1024);
+            uploadData.current = {
+              value: sensorCurrent,
+              dateTime: now.toISOString(),
+            };
+            // console.log('Current Sensor:', uploadData);
 
-          //   break;
+            if (sensorCurrent >= threshold) {
+              uploadData.gps.on = true;
+            } else {
+              uploadData.gps.on = false;
+            }
+
+            break;
         }
       }
-      console.log('Upload Node ID: ', uploadData.nodeId, " | Batt Value:", uploadData.nodeBattery.value);
+
+      // console.log('Upload Data: ', uploadData);
       if (uploadData.nodeId > 60928) {
         DynamoDB.updateACNode(uploadData); //AgriComm Network
+        incomeData.network = uploadData;
       } else {
         DynamoDB.updateNode(uploadData);
+        incomeData.node = uploadData
       }
     }
+    console.log("Income Data: ",incomeData);
 
     // server.send(msg, senderInfo.port, senderInfo.address, () => {
     //   console.log(`Message sent to ${senderInfo.address}:${senderInfo.port}`);
@@ -226,8 +247,8 @@ server.on('message', (msg, senderInfo) => {
     console.log(err);
     let url =
       'https://discord.com/api/webhooks/805085262337933332/D9Jn_IOBz134Qh-aVwJhPHk-kWSXDVvlym2TjCC8J35q1D6xAQbfdUdNTGtJlUmnbyhV';
-    // let message = `Body: ${body} | Error: ${err}`;
-    // discord_message(url, message);
+    let message = `Body: ${body} | Error: ${err}`;
+    discord_message(url, message);
   }
 });
 

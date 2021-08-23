@@ -93,11 +93,12 @@ function updateNode(data) {
     Key: { id: data.id },
     ReturnValues: 'ALL_NEW',
     UpdateExpression:
-      'SET #gps = list_append(if_not_exists(#gps, :empty_list), :gps), #nodeBattery = list_append(if_not_exists(#nodeBattery, :empty_list), :nodeBattery), #solarVoltage = list_append(if_not_exists(#solarVoltage, :empty_list), :solarVoltage), #createdAt = if_not_exists(#createdAt, :createdAt), #typeName = if_not_exists(#typeName, :typeName), #updatedAt = :updatedAt, #nodeType = if_not_exists(#nodeType, :nodeType), #nodeId = if_not_exists(#nodeId, :nodeId)',
+      'SET #gps = list_append(if_not_exists(#gps, :empty_list), :gps), #nodeBattery = list_append(if_not_exists(#nodeBattery, :empty_list), :nodeBattery), #solarVoltage = list_append(if_not_exists(#solarVoltage, :empty_list), :solarVoltage),  #current = list_append(if_not_exists(#current, :empty_list), :current), #createdAt = if_not_exists(#createdAt, :createdAt), #typeName = if_not_exists(#typeName, :typeName), #updatedAt = :updatedAt, #nodeType = if_not_exists(#nodeType, :nodeType), #nodeId = if_not_exists(#nodeId, :nodeId)',
     ExpressionAttributeNames: {
       '#gps': 'gps',
       '#nodeBattery': 'nodeBattery',
       '#solarVoltage': 'solarVoltage',
+      '#current': 'current',
       '#createdAt': 'createdAt',
       '#typeName': '__typename',
       '#nodeId': 'nodeId',
@@ -108,6 +109,7 @@ function updateNode(data) {
       ':gps': [data.gps],
       ':nodeBattery': [data.nodeBattery],
       ':solarVoltage': [data.solarVoltage],
+      ':current': [data.current],
       ':empty_list': [],
       ':createdAt': dt.toISOString(),
       ':typeName': 'Node',
