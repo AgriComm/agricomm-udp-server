@@ -240,7 +240,7 @@ server.on('message', (msg, senderInfo) => {
         incomeData.node = uploadData
       }
     }
-    console.log("Income Data: ",incomeData);
+    // console.log("Income Data: ",incomeData);
 
     // server.send(msg, senderInfo.port, senderInfo.address, () => {
     //   console.log(`Message sent to ${senderInfo.address}:${senderInfo.port}`);
