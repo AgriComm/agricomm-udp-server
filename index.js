@@ -161,18 +161,18 @@ server.on('message', (msg, senderInfo) => {
             if (gps != '') {
               gps_data = gps.split(',');
               // console.log('Gps Data: ', gps_data);
-              console.log("Validity: ", gps_data[2])
+              // console.log("Validity: ", gps_data[2])
 
               // Only push when the validity of the GPS is "A"
               // console.log('GPS Data:', gps);
               // console.log('GPS Precision Value: ', gps_data[2]);
-              // if (gps_data[2] === 'A') {
+              if (gps_data[2] === 'A') {
                 uploadData.nodeType = 'GPS'; // Shows that the line in the db has gps values
                 // console.log("A Okay")
                 let latitude = parseFloat(
                   lat(gps_data[3], gps_data[4]).toFixed(6)
                 );
-                console.log("latitude:", latitude)
+                console.log("Latitude: ", latitude)
                 let longitude = parseFloat(
                   lng(gps_data[5], gps_data[6]).toFixed(6)
                 );
