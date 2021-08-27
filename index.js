@@ -161,7 +161,7 @@ server.on('message', (msg, senderInfo) => {
             if (gps != '') {
               gps_data = gps.split(',');
               // console.log('Gps Data: ', gps_data);
-              // console.log("Validity: ", gps_data[2])
+              console.log("Validity: ", gps_data[2])
 
               // Only push when the validity of the GPS is "A"
               // console.log('GPS Data:', gps);
@@ -257,7 +257,7 @@ server.on('message', (msg, senderInfo) => {
     console.log(err);
     let url =
       'https://discord.com/api/webhooks/805085262337933332/D9Jn_IOBz134Qh-aVwJhPHk-kWSXDVvlym2TjCC8J35q1D6xAQbfdUdNTGtJlUmnbyhV';
-    let message = `Body: ${body} | Error: ${err}`;
+    let message = `Error: ${err}`;
     discord_message(url, message);
   }
 });
