@@ -200,6 +200,8 @@ server.on('message', (msg, senderInfo) => {
                 };
               }
 
+              console.log("GPS Data:", uploadData.gps)
+
               // var dt = new Date();
               // dt.setTime(dt.getTime() + 2 * 60 * 60 * 1000);
 
