@@ -78,7 +78,7 @@ server.on('message', (msg, senderInfo) => {
     let readings = body.split('AA');
     // console.log(readings);
 
-    let incomeData = {}
+    let incomeData = {};
 
     for (let i = 1; i < readings.length; i++) {
       let readingTime = Date.now();
@@ -200,7 +200,15 @@ server.on('message', (msg, senderInfo) => {
                 };
               }
 
-              console.log("GPS Data:", uploadData.gps)
+              console.log('GPS Data:', {
+                location: {
+                  lat: latitude,
+                  lng: longitude,
+                },
+                speed: speed,
+                heatWeight: heatWeight,
+                dateTime: now.toISOString(),
+              });
 
               // var dt = new Date();
               // dt.setTime(dt.getTime() + 2 * 60 * 60 * 1000);
@@ -237,7 +245,7 @@ server.on('message', (msg, senderInfo) => {
         incomeData.network = uploadData;
       } else {
         DynamoDB.updateNode(uploadData);
-        incomeData.node = uploadData
+        incomeData.node = uploadData;
       }
     }
     // console.log("Income Data: ",incomeData);
