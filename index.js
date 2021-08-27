@@ -256,10 +256,10 @@ server.on('message', (msg, senderInfo) => {
     // });
   } catch (err) {
     console.log(err);
-    let url =
-      'https://discord.com/api/webhooks/805085262337933332/D9Jn_IOBz134Qh-aVwJhPHk-kWSXDVvlym2TjCC8J35q1D6xAQbfdUdNTGtJlUmnbyhV';
-    let message = `Error: ${err}`;
-    discord_message(url, message);
+    // let url =
+    //   'https://discord.com/api/webhooks/805085262337933332/D9Jn_IOBz134Qh-aVwJhPHk-kWSXDVvlym2TjCC8J35q1D6xAQbfdUdNTGtJlUmnbyhV';
+    // let message = `Error: ${err}`;
+    // discord_message(url, message);
   }
 });
 
