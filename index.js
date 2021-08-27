@@ -219,11 +219,11 @@ server.on('message', (msg, senderInfo) => {
             };
             // console.log('Current Sensor:', uploadData);
 
-            if (sensorCurrent >= threshold) {
-              uploadData.gps.on = true;
-            } else {
-              uploadData.gps.on = false;
-            }
+            // if (sensorCurrent >= threshold) {
+            //   uploadData.gps.on = true;
+            // } else {
+            //   uploadData.gps.on = false;
+            // }
 
             break;
         }
