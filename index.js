@@ -201,15 +201,7 @@ server.on('message', (msg, senderInfo) => {
                 };
               }
 
-              console.log('GPS Data:', {
-                location: {
-                  lat: latitude,
-                  lng: longitude,
-                },
-                speed: speed,
-                heatWeight: heatWeight,
-                dateTime: now.toISOString(),
-              });
+              console.log('GPS Data:', gps_data);
 
               // var dt = new Date();
               // dt.setTime(dt.getTime() + 2 * 60 * 60 * 1000);
