@@ -151,7 +151,7 @@ server.on('message', (msg, senderInfo) => {
           case 4: // GPS
             // Documentation: http://aprs.gids.nl/nmea/
             let gps = '';
-            // console.log('GPS Sensor Reading:', sensor_reading);
+            console.log('GPS Sensor Reading:', sensor_reading);
 
             for (let l = 0; l < sensor_reading.length; l = l + 2) {
               let acii = hex2a(`${sensor_reading.slice(l, l + 2)}`);
