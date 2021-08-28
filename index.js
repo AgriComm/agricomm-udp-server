@@ -168,6 +168,7 @@ server.on('message', (msg, senderInfo) => {
               // console.log('GPS Data:', gps);
               // console.log('GPS Precision Value: ', gps_data[2]);
               if (gps_data[2] === 'A') {
+                console.log("GPS DAta sent")
                 uploadData.nodeType = 'GPS'; // Shows that the line in the db has gps values
                 // console.log("A Okay")
                 let latitude = parseFloat(
