@@ -87,6 +87,7 @@ server.on('message', (msg, senderInfo) => {
       // console.log("Payload: ", payload);
       //Get the node_id from
       let node_id = parseInt(payload[0], 16);
+      console.log("Node ID: ", node_id);
       // console.log(`${node_id}:${time_new.getUTCFullYear()}:${time_new.getMonth()+1}:${time_new.getDate()}`)
 
       // let id = ;
@@ -151,7 +152,7 @@ server.on('message', (msg, senderInfo) => {
           case 4: // GPS
             // Documentation: http://aprs.gids.nl/nmea/
             let gps = '';
-            console.log('GPS Sensor Reading:', sensor_reading);
+            // console.log('GPS Sensor Reading:', sensor_reading);
 
             for (let l = 0; l < sensor_reading.length; l = l + 2) {
               let acii = hex2a(`${sensor_reading.slice(l, l + 2)}`);
@@ -172,7 +173,7 @@ server.on('message', (msg, senderInfo) => {
                 let latitude = parseFloat(
                   lat(gps_data[3], gps_data[4]).toFixed(6)
                 );
-                console.log("Latitude: ", latitude)
+                // console.log("Latitude: ", latitude)
                 let longitude = parseFloat(
                   lng(gps_data[5], gps_data[6]).toFixed(6)
                 );
@@ -201,7 +202,7 @@ server.on('message', (msg, senderInfo) => {
                 };
               }
 
-              console.log('GPS Data:', gps_data);
+              // console.log('GPS Data:', gps_data);
 
               // var dt = new Date();
               // dt.setTime(dt.getTime() + 2 * 60 * 60 * 1000);
