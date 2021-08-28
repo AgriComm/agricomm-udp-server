@@ -248,7 +248,7 @@ server.on('message', (msg, senderInfo) => {
     //   console.log(`Message sent to ${senderInfo.address}:${senderInfo.port}`);
     // });
   } catch (err) {
-    console.log(err);
+    console.log("err");
     // let url =
     //   'https://discord.com/api/webhooks/805085262337933332/D9Jn_IOBz134Qh-aVwJhPHk-kWSXDVvlym2TjCC8J35q1D6xAQbfdUdNTGtJlUmnbyhV';
     // let message = `Error: ${err}`;
