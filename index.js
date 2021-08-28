@@ -161,7 +161,7 @@ server.on('message', (msg, senderInfo) => {
 
             if (gps != '') {
               gps_data = gps.split(',');
-              // console.log('Gps Data: ', gps_data);
+              console.log('Gps Data: ', gps_data);
               // console.log("Validity: ", gps_data[2])
 
               // Only push when the validity of the GPS is "A"
