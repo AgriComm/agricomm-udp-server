@@ -74,7 +74,7 @@ server.on('message', (msg, senderInfo) => {
     let avg_occ = count / diff;
     let body = '' + msg;
     //Split sting into the nodes/readings
-    // console.log('Body: ', body);
+    console.log('Body: ', body);
     let readings = body.split('AA');
     // console.log(readings);
 
